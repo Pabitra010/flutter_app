@@ -10,16 +10,16 @@ class StopWatch extends StatefulWidget {
 
 class _StopWatchState extends State<StopWatch> {
   late Timer _timer;
-  int _milliseconds = 0;
+  int _centiseconds = 0; // 1 unit = 0.01 seconds (10 ms)
   bool _isRunning = false;
 
   void _startStopwatch() {
     if (_isRunning) {
       _timer.cancel();
     } else {
-      _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
+      _timer = Timer.periodic(Duration(milliseconds: 10), (timer) {
         setState(() {
-          _milliseconds++;
+          _centiseconds++;
         });
       });
     }
@@ -32,20 +32,20 @@ class _StopWatchState extends State<StopWatch> {
   void _resetStopwatch() {
     if (_isRunning) _timer.cancel();
     setState(() {
-      _milliseconds = 0;
+      _centiseconds = 0;
       _isRunning = false;
     });
   }
 
-  String _formatTime(int milliseconds) {
-    int minutes = milliseconds ~/ 600;
-    int seconds = (milliseconds % 600) ~/ 10;
-    int millis = milliseconds % 10;
+  String _formatTime(int centiseconds) {
+    int minutes = centiseconds ~/ 6000; // 6000 cs = 60 s = 1 min
+    int seconds = (centiseconds % 6000) ~/ 100; // 100 cs = 1 sec
+    int cs = centiseconds % 100; // remaining centiseconds
+
     return '${minutes.toString().padLeft(2, '0')}:'
            '${seconds.toString().padLeft(2, '0')}:'
-           '${(millis * 100).toString().padLeft(3, '0')}';
+           '${cs.toString().padLeft(2, '0')}';
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +63,7 @@ class _StopWatchState extends State<StopWatch> {
             children: [
               // Display
               Text(
-                _formatTime(_milliseconds),
+                _formatTime(_centiseconds),
                 style: TextStyle(
                   fontSize: 60,
                   fontWeight: FontWeight.bold,
